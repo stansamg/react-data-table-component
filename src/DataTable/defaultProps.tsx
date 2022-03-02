@@ -100,4 +100,6 @@ export const defaultProps = {
 	onSelectedRowsChange: noop,
 	onSort: noop,
 	onColumnOrderChange: noop,
+	onColumnResize: noop,
+	minColumnsWidth: '40px',
 };

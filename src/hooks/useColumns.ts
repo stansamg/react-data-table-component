@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { decorateColumns, findColumnIndexById, getSortDirection } from '../DataTable/util';
 import useDidUpdateEffect from '../hooks/useDidUpdateEffect';
-import { SortOrder, TableColumn } from '../DataTable/types';
+import { SortOrder, TableColumn, TableColumnResizeEvent } from '../DataTable/types';
 
 type ColumnsHook<T> = {
 	tableColumns: TableColumn<T>[];
@@ -13,11 +13,13 @@ type ColumnsHook<T> = {
 	handleDragEnd: (e: React.DragEvent<HTMLDivElement>) => void;
 	defaultSortDirection: SortOrder;
 	defaultSortColumn: TableColumn<T>;
+	handleColumnResize: (e: TableColumnResizeEvent<T>) => void;
 };
 
 function useColumns<T>(
 	columns: TableColumn<T>[],
 	onColumnOrderChange: (nextOrder: TableColumn<T>[]) => void,
+	onColumnResize: (e: TableColumnResizeEvent<T>) => void,
 	defaultSortFieldId: string | number | null | undefined,
 	defaultSortAsc: boolean,
 ): ColumnsHook<T> {
@@ -86,6 +88,11 @@ function useColumns<T>(
 		[defaultSortFieldId, tableColumns],
 	);
 
+	const handleColumnResize = ({ id, width }: TableColumnResizeEvent<T>) => {
+		onColumnResize({ id, width });
+		setTableColumns(items => items.map(item => (item.id === id ? { ...item, width } : item)));
+	};
+
 	return {
 		tableColumns,
 		draggingColumnId,
@@ -96,6 +103,7 @@ function useColumns<T>(
 		handleDragEnd,
 		defaultSortDirection,
 		defaultSortColumn,
+		handleColumnResize,
 	};
 }
 

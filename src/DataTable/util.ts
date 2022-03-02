@@ -1,5 +1,5 @@
 import { CSSObject } from 'styled-components';
-import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction } from './types';
+import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction, Nullable } from './types';
 
 export function prop<T, K extends keyof T>(obj: T, key: K): T[K] {
 	return obj[key];
@@ -254,3 +254,5 @@ export function findColumnIndexById<T>(columns: TableColumn<T>[], id: string | u
 export function equalizeId(a: string | number | undefined, b: string | number | undefined): boolean {
 	return a == b;
 }
+
+export const toNumber = (v: Nullable<string>): number | null => (v && parseFloat(v)) || null;

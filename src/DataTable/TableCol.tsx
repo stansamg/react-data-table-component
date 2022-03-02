@@ -2,8 +2,10 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { CellExtended, CellProps } from './Cell';
 import NativeSortIcon from '../icons/NativeSortIcon';
-import { equalizeId } from './util';
-import { TableColumn, SortAction, SortOrder } from './types';
+import { equalizeId, toNumber } from './util';
+import { TableColumn, SortAction, SortOrder, TableColumnResizeEvent } from './types';
+import TableColResizeElement from './TableColResizeElement';
+import { ADDITIONAL_RESIZE_MARGIN_WIDTH } from './constants';
 
 interface ColumnStyleProps extends CellProps {
 	isDragging?: boolean;
@@ -98,6 +100,8 @@ type TableColProps<T> = {
 	onDragEnd: (e: React.DragEvent<HTMLDivElement>) => void;
 	onDragEnter: (e: React.DragEvent<HTMLDivElement>) => void;
 	onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
+	onColumnResize: (e: TableColumnResizeEvent<T>) => void;
+	minColumnsWidth: string;
 };
 
 function TableCol<T>({
@@ -118,6 +122,8 @@ function TableCol<T>({
 	onDragEnd,
 	onDragEnter,
 	onDragLeave,
+	onColumnResize,
+	minColumnsWidth,
 }: TableColProps<T>): JSX.Element | null {
 	React.useEffect(() => {
 		if (typeof column.selector === 'string') {
@@ -130,6 +136,7 @@ function TableCol<T>({
 
 	const [showTooltip, setShowTooltip] = React.useState(false);
 	const columnRef = React.useRef<HTMLDivElement | null>(null);
+	const wrapperRef = React.useRef<HTMLDivElement | null>(null);
 
 	React.useEffect(() => {
 		if (columnRef.current) {
@@ -167,6 +174,34 @@ function TableCol<T>({
 		}
 	};
 
+	const countElementWidth = (element: HTMLDivElement, newWidthN: number) => {
+		const { maxWidth, minWidth } = column;
+		const minWidthN = toNumber(minWidth || minColumnsWidth);
+		const maxWidthN = toNumber(maxWidth);
+
+		if (maxWidthN && newWidthN && newWidthN > maxWidthN) {
+			return maxWidthN;
+		}
+
+		if (minWidthN && newWidthN && newWidthN < minWidthN) {
+			return minWidthN;
+		}
+
+		return newWidthN;
+	};
+
+	const handleColumnResize = (event: React.MouseEvent) => {
+		const element = wrapperRef.current;
+		if (element) {
+			const clientRect = element.getBoundingClientRect();
+			const newWidth = event.clientX - clientRect.x + ADDITIONAL_RESIZE_MARGIN_WIDTH;
+			const correctedWidth = countElementWidth(element, newWidth);
+
+			console.log('width: ', correctedWidth);
+			onColumnResize({ id: column.id, width: `${correctedWidth}px` });
+		}
+	};
+
 	const renderNativeSortIcon = (sortActive: boolean) => (
 		<NativeSortIcon sortActive={sortActive} sortDirection={sortDirection} />
 	);
@@ -184,6 +219,7 @@ function TableCol<T>({
 
 	return (
 		<ColumnStyled
+			ref={wrapperRef}
 			data-column-id={column.id}
 			className="rdt_TableCol"
 			headCell
@@ -230,6 +266,8 @@ function TableCol<T>({
 
 					{!disableSort && customSortIconLeft && renderCustomSortIcon()}
 					{!disableSort && nativeSortIconLeft && renderNativeSortIcon(sortActive)}
+					{column.filter}
+					{column.resizable && <TableColResizeElement onWidthChange={handleColumnResize} />}
 				</ColumnSortable>
 			)}
 		</ColumnStyled>

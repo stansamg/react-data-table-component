@@ -1,4 +1,5 @@
 export const STOP_PROP_TAG = 'allowRowEvents';
+export const ADDITIONAL_RESIZE_MARGIN_WIDTH = 6;
 
 export enum Direction {
 	LTR = 'ltr',

@@ -113,6 +113,8 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		customStyles = defaultProps.customStyles,
 		direction = defaultProps.direction,
 		onColumnOrderChange = defaultProps.onColumnOrderChange,
+		onColumnResize = defaultProps.onColumnResize,
+		minColumnsWidth = defaultProps.minColumnsWidth,
 	} = props;
 
 	const {
@@ -125,7 +127,8 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		handleDragEnd,
 		defaultSortDirection,
 		defaultSortColumn,
-	} = useColumns(columns, onColumnOrderChange, defaultSortFieldId, defaultSortAsc);
+		handleColumnResize,
+	} = useColumns(columns, onColumnOrderChange, onColumnResize, defaultSortFieldId, defaultSortAsc);
 
 	const [
 		{
@@ -399,7 +402,9 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 											onDragEnd={handleDragEnd}
 											onDragEnter={handleDragEnter}
 											onDragLeave={handleDragLeave}
+											onColumnResize={handleColumnResize}
 											draggingColumnId={draggingColumnId}
+											minColumnsWidth={minColumnsWidth}
 										/>
 									))}
 								</HeadRow>
