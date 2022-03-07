@@ -19,8 +19,12 @@ import {
 	PaginationComponent,
 	PaginationServerOptions,
 } from './pagination';
+import {IStorage, TableStoreType} from "./storage";
 
-export type TableProps<DataType> = {
+export type TableStorageProps = { storage?: never; storageKey?: never }
+															| { storage: IStorage<TableStoreType>; storageKey: string };
+
+export type TableProps<DataType> = TableStorageProps & {
 	actions?: React.ReactNode | React.ReactNode[];
 	className?: string;
 
@@ -32,7 +36,7 @@ export type TableProps<DataType> = {
 	onSort?: (selectedColumn: TableColumn<DataType>, sortDirection: SortOrder) => void;
 	onColumnOrderChange?: (nextOrder: TableColumn<DataType>[]) => void;
 	minColumnsWidth?: string;
-	onColumnResize: (e: TableColumnResizeEvent<DataType>) => void;
+	onColumnResize?: (e: TableColumnResizeEvent<DataType>) => void;
 
 	//rows
 	clearSelectedRows?: boolean;
@@ -117,6 +121,8 @@ export type TableProps<DataType> = {
 	 *  */
 	title?: string | React.ReactNode;
 };
+
+
 
 export type TableState<T> = {
 	allSelected: boolean;

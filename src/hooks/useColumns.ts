@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { decorateColumns, findColumnIndexById, getSortDirection } from '../DataTable/util';
 import useDidUpdateEffect from '../hooks/useDidUpdateEffect';
-import { SortOrder, TableColumn, TableColumnResizeEvent } from '../DataTable/types';
+import {IStorage, SortOrder, TableColumn, TableColumnResizeEvent, TableStoreType} from '../DataTable/types';
 
 type ColumnsHook<T> = {
 	tableColumns: TableColumn<T>[];
@@ -22,6 +22,8 @@ function useColumns<T>(
 	onColumnResize: (e: TableColumnResizeEvent<T>) => void,
 	defaultSortFieldId: string | number | null | undefined,
 	defaultSortAsc: boolean,
+	storage?: IStorage<TableStoreType>,
+	storageKey?: string,
 ): ColumnsHook<T> {
 	const [tableColumns, setTableColumns] = React.useState<TableColumn<T>[]>(() => decorateColumns(columns));
 	const [draggingColumnId, setDraggingColumn] = React.useState('');

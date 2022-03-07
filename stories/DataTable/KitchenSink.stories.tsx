@@ -55,7 +55,7 @@ const columns: TableColumn<Row>[] = [
 	},
 ];
 
-interface TablePropsExtended extends TableProps<Row> {
+type TablePropsExtended = TableProps<Row> & {
 	selectableRowsRadio: boolean;
 }
 
@@ -88,6 +88,7 @@ function KitchenSinkStory({
 	subHeaderWrap,
 	responsive,
 	disabled,
+	onColumnResize,
 }: TablePropsExtended): JSX.Element {
 	const selectableRowsComponentProps = React.useMemo(
 		() => ({
@@ -132,6 +133,7 @@ function KitchenSinkStory({
 			direction={direction}
 			responsive={responsive}
 			disabled={disabled}
+			onColumnResize={onColumnResize}
 		/>
 	);
 }

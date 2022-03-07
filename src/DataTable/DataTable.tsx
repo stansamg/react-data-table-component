@@ -115,6 +115,8 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		onColumnOrderChange = defaultProps.onColumnOrderChange,
 		onColumnResize = defaultProps.onColumnResize,
 		minColumnsWidth = defaultProps.minColumnsWidth,
+		storage,
+		storageKey,
 	} = props;
 
 	const {
@@ -128,7 +130,7 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		defaultSortDirection,
 		defaultSortColumn,
 		handleColumnResize,
-	} = useColumns(columns, onColumnOrderChange, onColumnResize, defaultSortFieldId, defaultSortAsc);
+	} = useColumns(columns, onColumnOrderChange, onColumnResize, defaultSortFieldId, defaultSortAsc, storage, storageKey);
 
 	const [
 		{

@@ -24,6 +24,7 @@
   "prepublish": "tsc",
   "scripts": {
     "prepublishOnly": "npm run build",
+    "prepublish": "tsc",
     "build:dev": "rollup -c rollup/rollup.config.dev.js -m",
     "build:umd": "rollup -c rollup/rollup.config.umd.js",
     "build:cjs": "rollup -c rollup/rollup.config.cjs.js",
