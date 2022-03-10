@@ -1,4 +1,6 @@
 import * as React from 'react';
+import debounce from "lodash.debounce";
+import deepmerge from 'deepmerge';
 import { ThemeProvider } from 'styled-components';
 import { tableReducer } from './tableReducer';
 import Table from './Table';
@@ -29,9 +31,11 @@ import {
 	SortAction,
 	TableProps,
 	TableState,
-	SortOrder,
+	SortOrder, TableColumnResizeEvent, TableStoreType,
 } from './types';
 import useColumns from '../hooks/useColumns';
+
+const STORE_UPDATE_DEBOUNCE = 500;
 
 function DataTable<T>(props: TableProps<T>): JSX.Element {
 	const {
@@ -119,6 +123,29 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		storageKey,
 	} = props;
 
+	const updateStorage = React.useMemo(
+		() =>
+			debounce((state: TableStoreType) => {
+				if (storage && storageKey) {
+					const existData = storage.getItem(storageKey) || {};
+					storage.setItem(storageKey, deepmerge(existData, state))
+				}
+			}, STORE_UPDATE_DEBOUNCE),
+		[storage, storageKey],
+	);
+
+	const updateStorageSize = (e: TableColumnResizeEvent<T>) => {
+		onColumnResize(e);
+
+		if (e.id && e.width) {
+			updateStorage({
+				initialSize: {
+					[e.id]: e.width
+				}
+			})
+		}
+	}
+
 	const {
 		tableColumns,
 		draggingColumnId,
@@ -130,7 +157,7 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 		defaultSortDirection,
 		defaultSortColumn,
 		handleColumnResize,
-	} = useColumns(columns, onColumnOrderChange, onColumnResize, defaultSortFieldId, defaultSortAsc, storage, storageKey);
+	} = useColumns(columns, onColumnOrderChange, updateStorageSize, defaultSortFieldId, defaultSortAsc, storage, storageKey);
 
 	const [
 		{
@@ -280,6 +307,10 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 	}, [toggleOnSelectedRowsChange]);
 
 	useDidUpdateEffect(() => {
+		updateStorage({
+			initialSortColumn: String(selectedColumn.id),
+			initialSortType: sortDirection === SortOrder.ASC ? "asc" : "desc" ,
+		});
 		onSort(selectedColumn, sortDirection);
 	}, [selectedColumn, sortDirection]);
 
@@ -369,21 +400,21 @@ function DataTable<T>(props: TableProps<T>): JSX.Element {
 							<Head className="rdt_TableHead" role="rowgroup" fixedHeader={fixedHeader}>
 								<HeadRow className="rdt_TableHeadRow" role="row" dense={dense}>
 									{selectableRows &&
-										(showSelectAll ? (
-											<CellBase style={{ flex: '0 0 48px' }} />
-										) : (
-											<ColumnCheckbox
-												allSelected={allSelected}
-												selectedRows={selectedRows}
-												selectableRowsComponent={selectableRowsComponent}
-												selectableRowsComponentProps={selectableRowsComponentProps}
-												selectableRowDisabled={selectableRowDisabled}
-												rowData={visibleRows}
-												keyField={keyField}
-												mergeSelections={mergeSelections}
-												onSelectAllRows={handleSelectAllRows}
-											/>
-										))}
+									(showSelectAll ? (
+										<CellBase style={{ flex: '0 0 48px' }} />
+									) : (
+										<ColumnCheckbox
+											allSelected={allSelected}
+											selectedRows={selectedRows}
+											selectableRowsComponent={selectableRowsComponent}
+											selectableRowsComponentProps={selectableRowsComponentProps}
+											selectableRowDisabled={selectableRowDisabled}
+											rowData={visibleRows}
+											keyField={keyField}
+											mergeSelections={mergeSelections}
+											onSelectAllRows={handleSelectAllRows}
+										/>
+									))}
 									{expandableRows && !expandableRowsHideExpander && <ColumnExpander />}
 									{tableColumns.map(column => (
 										<Column

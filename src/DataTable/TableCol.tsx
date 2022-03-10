@@ -31,7 +31,7 @@ const sortableCSS = css<ColumnSortableProps>`
 	span.__rdt_custom_sort_icon__ {
 		i,
 		svg {
-			transform: 'translate3d(0, 0, 0)';
+			transform: translate3d(0, 0, 0);
 			${({ sortActive }) => (sortActive ? 'opacity: 1' : 'opacity: 0')};
 			color: inherit;
 			font-size: 18px;
@@ -50,8 +50,8 @@ const sortableCSS = css<ColumnSortableProps>`
 	}
 
 	${({ sortActive }) =>
-		!sortActive &&
-		css`
+	!sortActive &&
+	css`
 			&:hover,
 			&:focus {
 				opacity: 0.7;
@@ -105,26 +105,26 @@ type TableColProps<T> = {
 };
 
 function TableCol<T>({
-	column,
-	disabled,
-	draggingColumnId,
-	selectedColumn = {},
-	sortDirection,
-	sortIcon,
-	sortServer,
-	pagination,
-	paginationServer,
-	persistSelectedOnSort,
-	selectableRowsVisibleOnly,
-	onSort,
-	onDragStart,
-	onDragOver,
-	onDragEnd,
-	onDragEnter,
-	onDragLeave,
-	onColumnResize,
-	minColumnsWidth,
-}: TableColProps<T>): JSX.Element | null {
+											 column,
+											 disabled,
+											 draggingColumnId,
+											 selectedColumn = {},
+											 sortDirection,
+											 sortIcon,
+											 sortServer,
+											 pagination,
+											 paginationServer,
+											 persistSelectedOnSort,
+											 selectableRowsVisibleOnly,
+											 onSort,
+											 onDragStart,
+											 onDragOver,
+											 onDragEnd,
+											 onDragEnter,
+											 onDragLeave,
+											 onColumnResize,
+											 minColumnsWidth,
+										 }: TableColProps<T>): JSX.Element | null {
 	React.useEffect(() => {
 		if (typeof column.selector === 'string') {
 			console.error(

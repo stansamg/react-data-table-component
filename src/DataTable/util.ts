@@ -1,5 +1,5 @@
 import { CSSObject } from 'styled-components';
-import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction, Nullable } from './types';
+import { ConditionalStyles, TableColumn, Format, TableRow, Selector, SortOrder, SortFunction, Nullable, ColumnWidthObjectType } from './types';
 
 export function prop<T, K extends keyof T>(obj: T, key: K): T[K] {
 	return obj[key];
@@ -139,10 +139,11 @@ export function removeItem<T>(array: T[] = [], item: T, keyField = 'id'): T[] {
 }
 
 // Make sure columns have unique id's
-export function decorateColumns<T>(columns: TableColumn<T>[]): TableColumn<T>[] {
+export function decorateColumns<T>(columns: TableColumn<T>[], initialSize?: ColumnWidthObjectType): TableColumn<T>[] {
 	return columns.map((column, index) => {
 		const decoratedColumn: TableColumn<T> = {
 			...column,
+			width: column.width || column.id ? initialSize?.[String(column.id)] : undefined,
 			sortable: column.sortable || !!column.sortFunction || undefined,
 		};
 

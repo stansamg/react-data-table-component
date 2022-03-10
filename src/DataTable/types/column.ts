@@ -21,14 +21,14 @@ export type TableColumnBase = {
 	wrap?: boolean;
 };
 
-type TableColumnResizeProp<B extends boolean = false> = B extends true
+type TableColumnResizeProp<B> = B extends true
 	? { resizable: B; id: string | number }
 	: { resizable?: B; id?: string | number };
 
-export interface TableColumn<T, U extends object = object> extends TableColumnBase, TableColumnResizeProp {
+export type TableColumn<T, B = boolean> = TableColumnBase & TableColumnResizeProp<B> & {
 	name?: string | number | React.ReactNode;
 	sortField?: string;
-	cell?: (row: T, rowIndex: number, column: TableColumn<T, U>, id: string | number) => React.ReactNode;
+	cell?: (row: T, rowIndex: number, column: TableColumn<T>, id: string | number) => React.ReactNode;
 	conditionalCellStyles?: ConditionalStyles<T>[];
 	format?: Format<T> | undefined;
 	selector?: Selector<T>;

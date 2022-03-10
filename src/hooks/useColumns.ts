@@ -25,12 +25,15 @@ function useColumns<T>(
 	storage?: IStorage<TableStoreType>,
 	storageKey?: string,
 ): ColumnsHook<T> {
-	const [tableColumns, setTableColumns] = React.useState<TableColumn<T>[]>(() => decorateColumns(columns));
+	const { initialSortColumn, initialSize, initialSortType } = React.useMemo(() =>
+		(storageKey && storage && storage.getItem(storageKey)) || { initialSize: {} },
+		[ storage, storageKey ]);
+	const [tableColumns, setTableColumns] = React.useState<TableColumn<T>[]>(() => decorateColumns(columns, initialSize));
 	const [draggingColumnId, setDraggingColumn] = React.useState('');
 	const sourceColumnId = React.useRef('');
 
 	useDidUpdateEffect(() => {
-		setTableColumns(decorateColumns(columns));
+		setTableColumns(decorateColumns(columns, initialSize));
 	}, [columns]);
 
 	const handleDragStart = React.useCallback(
@@ -84,10 +87,10 @@ function useColumns<T>(
 		setDraggingColumn('');
 	}, []);
 
-	const defaultSortDirection = getSortDirection(defaultSortAsc);
+	const defaultSortDirection = getSortDirection(defaultSortAsc || initialSortType === 'asc');
 	const defaultSortColumn = React.useMemo(
-		() => tableColumns[findColumnIndexById(tableColumns, defaultSortFieldId?.toString())] || {},
-		[defaultSortFieldId, tableColumns],
+		() => tableColumns[findColumnIndexById(tableColumns, defaultSortFieldId?.toString() || initialSortColumn)] || {},
+		[defaultSortFieldId, tableColumns, initialSortColumn],
 	);
 
 	const handleColumnResize = ({ id, width }: TableColumnResizeEvent<T>) => {
